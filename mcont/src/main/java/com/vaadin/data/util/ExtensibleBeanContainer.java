@@ -126,7 +126,7 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
         return pd;
     }
 
-    protected static class NullProperty implements Property {
+    public static class NullProperty implements Property {
         private Class propertyType;
         private static Map<Class, NullProperty> instances = new HashMap<Class, NullProperty>();
 
@@ -154,6 +154,7 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
 
         @Override
         public void setValue(Object newValue) throws ReadOnlyException {
+            throw new ReadOnlyException("Property is read-only");
         }
 
         @Override
@@ -168,6 +169,8 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
 
         @Override
         public void setReadOnly(boolean newStatus) {
+            // no exception - this can coexist with other properties that can be
+            // set as read-write in the came Item
         }
     }
 
