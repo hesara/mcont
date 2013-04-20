@@ -1,5 +1,7 @@
 package org.vaadin.mcont;
 
+import java.util.Collection;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -22,6 +24,12 @@ public class ExtensibleBeanContainerTest {
 
         public String getName() {
             return name;
+        }
+    }
+
+    public static class Secretary extends Employee {
+        public Secretary(String name, String employer) {
+            super(name, employer);
         }
     }
 
@@ -55,6 +63,26 @@ public class ExtensibleBeanContainerTest {
         }
 
         public void setToy(String toy) {
+            this.toy = toy;
+        }
+    }
+
+    public static class MiddleAgedMan extends Person {
+        public static class Vehicle {
+        }
+
+        private Vehicle toy;
+
+        public MiddleAgedMan(String name, Vehicle favoriteToy) {
+            super(name);
+            setToy(favoriteToy);
+        }
+
+        public Vehicle getToy() {
+            return toy;
+        }
+
+        public void setToy(Vehicle toy) {
             this.toy = toy;
         }
     }
@@ -127,5 +155,51 @@ public class ExtensibleBeanContainerTest {
         container.addBean("employee1", new Employee("employee1", "employer1"));
         container.addBean("child1", new Child("child1", "rubber duck"));
         Assert.assertNull(container.getContainerProperty("child1", "toy"));
+    }
+
+    @Test
+    public void testGetItemPropertyIds() {
+        ExtensibleBeanContainer<String, Person> container = initializeContainer();
+        Collection<?> ids = container.getItem("person1").getItemPropertyIds();
+        Assert.assertEquals(3, ids.size());
+        Assert.assertTrue(ids.contains("name"));
+        Assert.assertTrue(ids.contains("employer"));
+        Assert.assertTrue(ids.contains("toy"));
+    }
+
+    @Test
+    public void testSamePropertyInstance() {
+        ExtensibleBeanContainer<String, Person> container = initializeContainer();
+        Assert.assertSame(container.getContainerProperty("person1", "name"),
+                container.getContainerProperty("person1", "name"));
+    }
+
+    @Test
+    public void testSimpleSubclass() {
+        ExtensibleBeanContainer<String, Person> container = new ExtensibleBeanContainer<String, Person>(
+                Person.class, Secretary.class);
+        Assert.assertTrue(container.getContainerPropertyIds().contains("name"));
+        Assert.assertTrue(container.getContainerPropertyIds().contains(
+                "employer"));
+
+        container.addBean("e1", new Employee("employee1", "employer1"));
+        container.addBean("s1", new Secretary("secretary1", "employer2"));
+        Assert.assertEquals("employee1",
+                container.getContainerProperty("e1", "name").getValue());
+        Assert.assertEquals("secretary1",
+                container.getContainerProperty("s1", "name").getValue());
+        // the field "employer" is only available for Secretary and its
+        // subclasses
+        Assert.assertEquals(null,
+                container.getContainerProperty("e1", "employer").getValue());
+        Assert.assertEquals("employer2",
+                container.getContainerProperty("s1", "employer").getValue());
+    }
+
+    @Test
+    public void testOverloadedField() {
+        ExtensibleBeanContainer<String, Person> container = new ExtensibleBeanContainer<String, Person>(
+                Person.class, Child.class, MiddleAgedMan.class);
+        Assert.assertEquals(Object.class, container.getType("toy"));
     }
 }

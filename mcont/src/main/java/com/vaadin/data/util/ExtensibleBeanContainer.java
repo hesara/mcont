@@ -187,7 +187,8 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
 
         @Override
         public Collection<?> getItemPropertyIds() {
-            return Collections.unmodifiableCollection(properties.keySet());
+            return Collections
+                    .unmodifiableCollection(propertyIdToType.keySet());
         }
 
         @Override
@@ -240,6 +241,8 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
         // TODO implement
         return false;
     }
+
+    // TODO remove container property
 
     public BeanItem addBean(IDTYPE id, BEANTYPE bean) {
         return super.addItem(id, bean);
