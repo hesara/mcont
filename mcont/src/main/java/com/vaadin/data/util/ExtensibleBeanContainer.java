@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.vaadin.data.Property;
@@ -19,9 +20,16 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
 
     private Field modelField;
 
-    private Map<Object, VaadinPropertyDescriptor<BEANTYPE>> properties;
+    // map from bean class to its property model
+    private Map<Class<?>, Map<String, VaadinPropertyDescriptor<BEANTYPE>>> properties = new HashMap<Class<?>, Map<String, VaadinPropertyDescriptor<BEANTYPE>>>();
 
-    public ExtensibleBeanContainer(Class<? super BEANTYPE> beanBaseClass) {
+    // final property types for each property id
+    // If different subclasses have a different type with same id, a common
+    // base class of the two is used.
+    private Map<String, Class<?>> propertyIdToType = new HashMap<String, Class<?>>();
+
+    public ExtensibleBeanContainer(Class<? super BEANTYPE> beanBaseClass,
+            Class<? extends BEANTYPE>... subclasses) {
         super(beanBaseClass);
 
         try {
@@ -33,6 +41,133 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(ExtensibleBeanContainer.class.getName()
                     + " is incompatible with the Vaadin version used");
+        }
+
+        // get property descriptors for subclasses
+        Map<String, VaadinPropertyDescriptor<BEANTYPE>> model = getModel();
+        properties.put(beanBaseClass, model);
+        for (Class<? extends BEANTYPE> cls : subclasses) {
+            LinkedHashMap<String, VaadinPropertyDescriptor<BEANTYPE>> submodel = BeanItem
+                    .getPropertyDescriptors((Class<BEANTYPE>) cls);
+            properties.put(cls, submodel);
+
+            for (String id : submodel.keySet()) {
+                Class<?> propertyType = submodel.get(id).getPropertyType();
+                if (propertyIdToType.containsKey(id)) {
+                    Class<?> oldPropertyType = propertyIdToType.get(id);
+                    if (!oldPropertyType.isAssignableFrom(propertyType)) {
+                        // TODO should use closest common ancestor
+                        propertyIdToType.put(id, Object.class);
+                    }
+                } else {
+                    propertyIdToType.put(id, propertyType);
+                }
+            }
+        }
+
+        for (String id : propertyIdToType.keySet()) {
+            if (!model.containsKey(id)) {
+                addContainerProperty(id,
+                        new MultiClassVaadinPropertyDescriptor(id));
+            }
+        }
+    }
+
+    protected class MultiClassVaadinPropertyDescriptor implements
+            VaadinPropertyDescriptor<BEANTYPE> {
+        private String name;
+
+        public MultiClassVaadinPropertyDescriptor(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Class<?> getPropertyType() {
+            return propertyIdToType.get(name);
+        }
+
+        @Override
+        public Property<?> createProperty(BEANTYPE bean) {
+            // find the property in the closest suitable superclass
+            VaadinPropertyDescriptor<BEANTYPE> pd = getPropertyDescriptor(bean,
+                    name);
+            // note that this does not support subclass specific nested
+            // properties
+            if (pd != null
+                    && !(pd instanceof ExtensibleBeanContainer.MultiClassVaadinPropertyDescriptor)) {
+                return pd.createProperty(bean);
+            } else {
+                return NullProperty.get(getPropertyType());
+            }
+        }
+    }
+
+    protected VaadinPropertyDescriptor<BEANTYPE> getPropertyDescriptor(
+            BEANTYPE bean, String propertyId) {
+        Class cls = bean.getClass();
+        VaadinPropertyDescriptor<BEANTYPE> pd = null;
+        Map<String, VaadinPropertyDescriptor<BEANTYPE>> map = properties
+                .get(cls);
+        if (map != null) {
+            pd = map.get(propertyId);
+        }
+        while (pd == null && cls != null && getBeanType().isAssignableFrom(cls)) {
+            cls = cls.getSuperclass();
+            map = properties.get(cls);
+            if (map != null) {
+                pd = map.get(propertyId);
+            }
+        }
+        return pd;
+    }
+
+    protected static class NullProperty implements Property {
+        private Class propertyType;
+        private static Map<Class, NullProperty> instances = new HashMap<Class, NullProperty>();
+
+        protected NullProperty(Class propertyType) {
+            this.propertyType = propertyType;
+        }
+
+        /**
+         * Get a (shared) instance of NullProperty for a given property type.
+         * 
+         * @param propertyType
+         * @return NullProperty instance
+         */
+        public static NullProperty get(Class propertyType) {
+            if (!instances.containsKey(propertyType)) {
+                instances.put(propertyType, new NullProperty(propertyType));
+            }
+            return instances.get(propertyType);
+        }
+
+        @Override
+        public Object getValue() {
+            return null;
+        }
+
+        @Override
+        public void setValue(Object newValue) throws ReadOnlyException {
+        }
+
+        @Override
+        public Class getType() {
+            return propertyType;
+        }
+
+        @Override
+        public boolean isReadOnly() {
+            return true;
+        }
+
+        @Override
+        public void setReadOnly(boolean newStatus) {
         }
     }
 
@@ -64,11 +199,12 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
         }
 
         protected Property createProperty(Object id) {
-            VaadinPropertyDescriptor pd = getModel().get(id);
-            Property property;
+            // get from the whole model including subclasses
+            VaadinPropertyDescriptor pd = getPropertyDescriptor(getBean(),
+                    (String) id);
             // TODO optimize by sharing metadata for
             // MethodPropertyDescriptor and NestedPropertyDescriptor
-            property = pd.createProperty(getBean());
+            Property property = pd.createProperty(getBean());
             return property;
         }
     }
@@ -95,5 +231,7 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
         // TODO implement
         return false;
     }
+
+    // TODO implement API for adding beans etc.
 
 }
