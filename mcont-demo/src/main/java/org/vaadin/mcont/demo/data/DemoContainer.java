@@ -7,9 +7,9 @@ public class DemoContainer extends ExtensibleBeanContainer {
     public DemoContainer() {
         super(Person.class, Employee.class, Child.class);
 
-        addItem("person1", new Person("person1"));
-        addItem("employee1", new Employee("employee1", "employer1"));
-        addItem("child1", new Child("child1", "rubber duck"));
+        addBean("person1", new Person("person1"));
+        addBean("employee1", new Employee("employee1", "employer1"));
+        addBean("child1", new Child("child1", "rubber duck"));
     }
 
 }

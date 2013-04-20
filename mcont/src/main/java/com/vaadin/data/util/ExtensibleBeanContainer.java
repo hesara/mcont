@@ -196,7 +196,9 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
             if (property == null) {
                 // create and add a property only when requested
                 property = createProperty(id);
-                addItemProperty(id, property);
+                if (property != null) {
+                    addItemProperty(id, property);
+                }
             }
             return property;
         }
@@ -207,8 +209,12 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
                     (String) id);
             // TODO optimize by sharing metadata for
             // MethodPropertyDescriptor and NestedPropertyDescriptor
-            Property property = pd.createProperty(getBean());
-            return property;
+            if (pd != null) {
+                Property property = pd.createProperty(getBean());
+                return property;
+            } else {
+                return null;
+            }
         }
     }
 
@@ -235,6 +241,10 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
         return false;
     }
 
-    // TODO implement API for adding beans etc.
+    public BeanItem addBean(IDTYPE id, BEANTYPE bean) {
+        return super.addItem(id, bean);
+    }
+
+    // TODO implement more API for adding beans, ID resolver etc.
 
 }
