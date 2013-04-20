@@ -3,12 +3,14 @@ package com.vaadin.data.util;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.vaadin.data.Property;
 
 /**
- * Extensible subclass of AbstractBeanContainer. BeanItem properties are initialized lazily.
+ * Extensible subclass of AbstractBeanContainer. BeanItem properties are
+ * initialized lazily.
  * 
  * @author Henri Sara
  */
@@ -26,13 +28,11 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
             modelField = AbstractBeanContainer.class.getDeclaredField("model");
             modelField.setAccessible(true);
         } catch (SecurityException e) {
-            throw new RuntimeException(
-                    ExtensibleBeanContainer.class.getName()
-                            + " is incompatible with the Vaadin version used");
+            throw new RuntimeException(ExtensibleBeanContainer.class.getName()
+                    + " is incompatible with the Vaadin version used");
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException(
-                    ExtensibleBeanContainer.class.getName()
-                            + " is incompatible with the Vaadin version used");
+            throw new RuntimeException(ExtensibleBeanContainer.class.getName()
+                    + " is incompatible with the Vaadin version used");
         }
     }
 
@@ -43,7 +43,8 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
     public class CompactBeanItem extends BeanItem<BEANTYPE> {
 
         public CompactBeanItem(BEANTYPE bean) {
-            super(bean, (Map<String, VaadinPropertyDescriptor<BEANTYPE>>) null);
+            super(bean,
+                    new HashMap<String, VaadinPropertyDescriptor<BEANTYPE>>());
         }
 
         @Override
