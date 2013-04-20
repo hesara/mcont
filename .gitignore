@@ -1,0 +1,12 @@
+target
+mcont/target
+mcont-demo/target
+.project
+.classpath
+.settings
+mcont/.project
+mcont/.classpath
+mcont/.settings
+mcont-demo/.project
+mcont-demo/.classpath
+mcont-demo/.settings
