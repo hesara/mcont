@@ -1,6 +1,6 @@
 # MCont Add-on for Vaadin 7
 
-MCont is a data source add-on for Vaadin 7.
+MCont is a data source add-on for Vaadin 7 that provides bean subclass support for BeanContainer.
 
 ## Online demo
 
@@ -12,7 +12,7 @@ Official releases of this add-on are available at Vaadin Directory. For Maven in
 
 ## Building and running demo
 
-git clone <url of the MCont repository>
+git clone http://github.com/hesara/mcont
 mvn clean install
 cd demo
 mvn jetty:run
@@ -23,43 +23,36 @@ To see the demo, navigate to http://localhost:8080/
 
 For further development of this add-on, the following tool-chain is recommended:
 - Eclipse IDE
-- m2e wtp plug-in (install it from Eclipse Marketplace)
-- Vaadin Eclipse plug-in (install it from Eclipse Marketplace)
-- JRebel Eclipse plug-in (install it from Eclipse Marketplace)
+- m2e (install it from Eclipse Marketplace)
+- command line git or EGit Eclipse plug-in (install it from Eclipse Marketplace)
 - Chrome browser
 
 ### Importing project
 
 Choose File > Import... > Existing Maven Projects
 
-Note that Eclipse may give "Plugin execution not covered by lifecycle configuration" errors for pom.xml. Use "Permanently mark goal resources in pom.xml as ignored in Eclipse build" quick-fix to mark these errors as permanently ignored in your project. Do not worry, the project still works fine. 
-
 ### Debugging server-side
-
-If you have not already compiled the widgetset, do it now by running vaadin:install Maven target for mcont-root project.
 
 If you have a JRebel license, it makes on the fly code changes faster. Just add JRebel nature to your mcont-demo project by clicking project with right mouse button and choosing JRebel > Add JRebel Nature
 
-To debug project and make code modifications on the fly in the server-side, right-click the mcont-demo project and choose Debug As > Debug on Server. Navigate to http://localhost:8080/mcont-demo/ to see the application.
-
-### Debugging client-side
-
-The most common way of debugging and making changes to the client-side code is dev-mode. To create debug configuration for it, open mcont-demo project properties and click "Create Development Mode Launch" button on the Vaadin tab. Right-click newly added "GWT development mode for mcont-demo.launch" and choose Debug As > Debug Configurations... Open up Classpath tab for the development mode configuration and choose User Entries. Click Advanced... and select Add Folders. Choose Java and Resources under mcont/src/main and click ok. Now you are ready to start debugging the client-side code by clicking debug. Click Launch Default Browser button in the GWT Development Mode in the launched application. Now you can modify and breakpoints to client-side classes and see changes by reloading the web page. 
-
-Another way of debugging client-side is superdev mode. To enable it, uncomment devModeRedirectEnabled line from the end of DemoWidgetSet.gwt.xml located under mcont-demo resources folder and compile the widgetset once by running vaadin:compile Maven target for mcont-demo. Refresh mcont-demo project resources by right clicking the project and choosing Refresh. Click "Create SuperDevMode Launch" button on the Vaadin tab of the mcont-demo project properties panel to create superder mode code server launch configuration and modify the class path as instructed above. After starting the code server by running SuperDevMode launch as Java application, you can navigate to http://localhost:8080/mcont-demo/?superdevmode. Now all code changes you do to your client side will get compiled as soon as you reload the web page. You can also access Java-sources and set breakpoints inside Chrome if you enable source maps from inspector settings. 
+To debug project and make code modifications on the fly in the server-side, right-click the mcont-demo project and choose Debug As > Maven build... and use the goal jetty:run. Navigate to http://localhost:8080/mcont-demo/ to see the application.
 
  
 ## Release notes
 
 ### Version 0.1.0-SNAPSHOT
-- ...
-- ...
+- ExtensibleBeanContainer that supports multiple subclasses of a bean class with different properties
+- NullProperty - a read-only Property implementation that always returns null as its value
+
+See the features list below for more information
 
 ## Roadmap
 
-This component is developed as a hobby with no public roadmap or any guarantees of upcoming releases. That said, the following features are planned for upcoming releases:
-- ...
-- ...
+This component is developed as a hobby with no public roadmap or any guarantees of upcoming releases.
+That said, the following features are planned for upcoming releases:
+- Support for BeanIdResolver
+- More efficient handling of metadata
+- Possibly filtering support
 
 ## Issue tracking
 
@@ -70,6 +63,7 @@ The issues for this add-on are tracked on its github.com page. All bug reports a
 Contributions are welcome, but there are no guarantees that they are accepted as such. Process for contributing is the following:
 - Fork this project
 - Create an issue to this project about the contribution (bug or feature) if there is no such issue about it already. Try to keep the scope minimal.
+- Use the Vaadin core coding conventions and formatting settings - see http://dev.vaadin.com/wiki/CodingConventions
 - Develop and test the fix or functionality carefully. Only include minimum amount of code needed to fix the issue.
 - Refer to the fixed issue in commit
 - Send a pull request for the original project
@@ -85,25 +79,31 @@ MCont is written by Henri Sara
 
 ## Getting started
 
-Here is a simple example on how to try out the add-on component:
-
-<...>
-
-For a more comprehensive example, see src/test/java/org/vaadin/template/demo/DemoUI.java
+See the unit tests and the demo mentioned above (src/main/java/org/vaadin/template/demo/DemoUI.java).
 
 ## Features
 
-### Feature A
+### ExtensibleBeanContainer
 
-<...>
+An alternative for BeanContainer that supports multiple bean subclasses which may have different properties.
 
-### Feature B
+The available properties are scanned for the base class and all subclasses given to the constructor of the container.
+Although other subclasses of the bean base class can be used in the container, only the properties of the initially listed classes are available in the container.
 
-<...>
+Items whose beans do not have one of the properties of the container return null as the property value (from a read-only NullProperty).
 
-### Feature C
+Properties of items in the container are only instantiated when they are accessed, leading to a lower initial memory and CPU overhead than Bean(Item)Container.
+However, the Property instances are not cleaned up so the memory usage can grow up to the size of a corresponding Bean(Item)Container.
 
-<...>
+Note that the current version of ExtensibleBeanContainer requires explicit IDs for beans when adding them to the container. Future versions may support ID generators like BeanContainer does (and BeanItemContainer uses internally). 
+
+### NullProperty
+
+A read-only Property implementation that always returns null.
+The instances of NullProperty are shared by data type and the property does not support listeners.
+The method get(Class propertyType) should be used to obtain an instance of NullProperty.
+
+See the javadoc for more information. 
 
 ## API
 
