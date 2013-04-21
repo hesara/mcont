@@ -5,7 +5,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.vaadin.data.Property.ReadOnlyException;
-import com.vaadin.data.util.ExtensibleBeanContainer.NullProperty;
+import com.vaadin.data.util.NullProperty;
 
 public class NullPropertyTest {
     @Test

@@ -126,54 +126,6 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
         return pd;
     }
 
-    public static class NullProperty implements Property {
-        private Class propertyType;
-        private static Map<Class, NullProperty> instances = new HashMap<Class, NullProperty>();
-
-        protected NullProperty(Class propertyType) {
-            this.propertyType = propertyType;
-        }
-
-        /**
-         * Get a (shared) instance of NullProperty for a given property type.
-         * 
-         * @param propertyType
-         * @return NullProperty instance
-         */
-        public static NullProperty get(Class propertyType) {
-            if (!instances.containsKey(propertyType)) {
-                instances.put(propertyType, new NullProperty(propertyType));
-            }
-            return instances.get(propertyType);
-        }
-
-        @Override
-        public Object getValue() {
-            return null;
-        }
-
-        @Override
-        public void setValue(Object newValue) throws ReadOnlyException {
-            throw new ReadOnlyException("Property is read-only");
-        }
-
-        @Override
-        public Class getType() {
-            return propertyType;
-        }
-
-        @Override
-        public boolean isReadOnly() {
-            return true;
-        }
-
-        @Override
-        public void setReadOnly(boolean newStatus) {
-            // no exception - this can coexist with other properties that can be
-            // set as read-write in the came Item
-        }
-    }
-
     /**
      * This variant of BeanItem creates property instances only when requested
      * and tries to minimize memory overhead by sharing metadata between them.
