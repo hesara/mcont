@@ -4,7 +4,7 @@ MCont is a data source add-on for Vaadin 7 that provides bean subclass support f
 
 ## Online demo
 
-Try the add-on demo at <url of the online demo>
+Try the add-on demo at http://hesara.app.fi/mcont-demo/
 
 ## Download release
 
@@ -23,9 +23,9 @@ To see the demo, navigate to http://localhost:8080/
 
 For further development of this add-on, the following tool-chain is recommended:
 - Eclipse IDE
-- m2e (install it from Eclipse Marketplace)
-- command line git or EGit Eclipse plug-in (install it from Eclipse Marketplace)
-- Chrome browser
+- m2e (install it from Eclipse Marketplace if not included in Eclipse)
+- command line git or EGit Eclipse plug-in (install it from Eclipse Marketplace if not included in Eclipse)
+- Google Chrome
 
 ### Importing project
 
@@ -40,7 +40,7 @@ To debug project and make code modifications on the fly in the server-side, righ
  
 ## Release notes
 
-### Version 0.1.0-SNAPSHOT
+### Version 0.1.0
 - ExtensibleBeanContainer that supports multiple subclasses of a bean class with different properties
 - NullProperty - a read-only Property implementation that always returns null as its value
 
@@ -50,7 +50,6 @@ See the features list below for more information
 
 This component is developed as a hobby with no public roadmap or any guarantees of upcoming releases.
 That said, the following features are planned for upcoming releases:
-- Support for BeanIdResolver
 - More efficient handling of metadata
 - Possibly filtering support
 
@@ -93,9 +92,9 @@ Although other subclasses of the bean base class can be used in the container, o
 Items whose beans do not have one of the properties of the container return null as the property value (from a read-only NullProperty).
 
 Properties of items in the container are only instantiated when they are accessed, leading to a lower initial memory and CPU overhead than Bean(Item)Container.
-However, the Property instances are not cleaned up so the memory usage can grow up to the size of a corresponding Bean(Item)Container.
+However, the Property instances are not cleaned up after access so the memory usage can grow up to a size approaching that of a corresponding Bean(Item)Container if the whole container is accessed. Some metadata are shared between items/properties (Method instances etc.) to reduce memory consumption.
 
-Note that the current version of ExtensibleBeanContainer requires explicit IDs for beans when adding them to the container. Future versions may support ID generators like BeanContainer does (and BeanItemContainer uses internally). 
+Either explicit item IDs or an ID generator can be used as with BeanContainer. 
 
 ### NullProperty
 
@@ -105,6 +104,3 @@ The method get(Class propertyType) should be used to obtain an instance of NullP
 
 See the javadoc for more information. 
 
-## API
-
-MCont JavaDoc is available online at <...>
