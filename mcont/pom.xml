@@ -6,7 +6,7 @@
 	<artifactId>mcont</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1.0</version>
-	<name>MCont Add-on</name>
+	<name>MCont</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
