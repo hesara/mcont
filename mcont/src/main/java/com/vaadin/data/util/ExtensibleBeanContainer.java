@@ -10,13 +10,13 @@ import java.util.Map;
 import com.vaadin.data.Property;
 
 /**
- * Extensible subclass of AbstractBeanContainer. BeanItem properties are
+ * Extensible subclass of BeanContainer. BeanItem properties are
  * initialized lazily.
  * 
  * @author Henri Sara
  */
 public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
-        AbstractBeanContainer<IDTYPE, BEANTYPE> {
+        BeanContainer<IDTYPE, BEANTYPE> {
 
     private Field modelField;
 
@@ -109,7 +109,7 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
 
     protected VaadinPropertyDescriptor<BEANTYPE> getPropertyDescriptor(
             BEANTYPE bean, String propertyId) {
-        Class cls = bean.getClass();
+        Class<?> cls = bean.getClass();
         VaadinPropertyDescriptor<BEANTYPE> pd = null;
         Map<String, VaadinPropertyDescriptor<BEANTYPE>> map = properties
                 .get(cls);
@@ -186,20 +186,9 @@ public class ExtensibleBeanContainer<IDTYPE, BEANTYPE> extends
             throw new IllegalStateException("Container model not accessible");
         }
     }
+    
+    
+    // TODO addNestedContainerProperty might or might not work - to check
 
-    @Override
-    public boolean addContainerProperty(Object propertyId, Class<?> type,
-            Object defaultValue) throws UnsupportedOperationException {
-        // TODO implement
-        return false;
-    }
-
-    // TODO remove container property
-
-    public BeanItem addBean(IDTYPE id, BEANTYPE bean) {
-        return super.addItem(id, bean);
-    }
-
-    // TODO implement more API for adding beans, ID resolver etc.
-
+    // TODO what API is missing?
 }

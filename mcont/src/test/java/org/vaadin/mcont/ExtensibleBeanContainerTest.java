@@ -95,9 +95,9 @@ public class ExtensibleBeanContainerTest {
 
     private ExtensibleBeanContainer<String, Person> initializeContainer() {
         ExtensibleBeanContainer<String, Person> container = createContainer();
-        container.addBean("person1", new Person("person1"));
-        container.addBean("employee1", new Employee("employee1", "employer1"));
-        container.addBean("child1", new Child("child1", "rubber duck"));
+        container.addItem("person1", new Person("person1"));
+        container.addItem("employee1", new Employee("employee1", "employer1"));
+        container.addItem("child1", new Child("child1", "rubber duck"));
         return container;
     }
 
@@ -151,9 +151,9 @@ public class ExtensibleBeanContainerTest {
                 "employer"));
         Assert.assertFalse(container.getContainerPropertyIds().contains("toy"));
 
-        container.addBean("person1", new Person("person1"));
-        container.addBean("employee1", new Employee("employee1", "employer1"));
-        container.addBean("child1", new Child("child1", "rubber duck"));
+        container.addItem("person1", new Person("person1"));
+        container.addItem("employee1", new Employee("employee1", "employer1"));
+        container.addItem("child1", new Child("child1", "rubber duck"));
         Assert.assertNull(container.getContainerProperty("child1", "toy"));
     }
 
@@ -182,8 +182,8 @@ public class ExtensibleBeanContainerTest {
         Assert.assertTrue(container.getContainerPropertyIds().contains(
                 "employer"));
 
-        container.addBean("e1", new Employee("employee1", "employer1"));
-        container.addBean("s1", new Secretary("secretary1", "employer2"));
+        container.addItem("e1", new Employee("employee1", "employer1"));
+        container.addItem("s1", new Secretary("secretary1", "employer2"));
         Assert.assertEquals("employee1",
                 container.getContainerProperty("e1", "name").getValue());
         Assert.assertEquals("secretary1",
