@@ -1,3 +1,6 @@
+[![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/mcont)
+[![Stars on Vaadin Directory](https://img.shields.io/vaadin-directory/star/mcont.svg)](https://vaadin.com/directory/component/mcont)
+
 # MCont Add-on for Vaadin 7
 
 MCont is a data source add-on for Vaadin 7 that provides bean subclass support for BeanContainer.
